@@ -31,6 +31,10 @@ export default function Tooltip() {
             }}>
                 Basculer : {useLayout ? 'useLayoutEffect' : 'useEffect'}
             </button>
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb8dc27a5d5e342909aef40e2cf5eb5c1c6a6aad
             <br /><br />
             <button ref={buttonRef}>Survolez-moi</button>
 
@@ -45,7 +49,14 @@ export default function Tooltip() {
                 transition: 'none',
             }}>
                 {position.top === 0 ? '⚡ FLASH (0,0)' : 'Info-bulle positionnée !'}
+<<<<<<< HEAD
             </div>
         </div>
     );
 }
+=======
+                    </div>
+                    </div>
+                    );
+                }
+>>>>>>> eb8dc27a5d5e342909aef40e2cf5eb5c1c6a6aad
