@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import api from '../api/axios';
-import Header from '../components/Header';
+import Header from '../components/HeaderMUI.tsx';
 import styles from './ProjectDetail.module.css';
 
 interface Project { id: string; name: string; color: string; }
