@@ -1,54 +1,63 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import type {RootState} from '../../store';
+import { loginStart, loginSuccess, loginFailure } from './authSlice';
 import styles from './Login.module.css';
 
 export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { state, dispatch } = useAuth();
+    const dispatch = useDispatch();
+
+    const { user, loading, error } = useSelector((state: RootState) => state.auth);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // Détermine où rediriger l'utilisateur après connexion
-    const from = (location.state as any)?.from?.pathname || '/dashboard';
+    const from =
+        (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
-    // Redirige automatiquement si l'utilisateur est déjà connecté
     useEffect(() => {
-        if (state.user) {
+        if (user) {
             navigate(from, { replace: true });
         }
-    }, [state.user, navigate, from]);
+    }, [user, navigate, from]);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        dispatch({ type: 'LOGIN_START' });
+
+        dispatch(loginStart());
 
         try {
-            // Simulation d'authentification via json-server
             const res = await fetch(`http://localhost:4000/users?email=${email}`);
             const users = await res.json();
 
-            // Vérification simple (Attention: ne jamais faire ça en production !)
-            if (users.length === 0 || users[0].password !== password) {
-                dispatch({
-                    type: 'LOGIN_FAILURE',
-                    payload: 'Email ou mot de passe incorrect'
-                });
+            if (!users || users.length === 0 || users[0].password !== password) {
+                dispatch(loginFailure('Email ou mot de passe incorrect'));
                 return;
             }
 
-            // On retire le mot de passe de l'objet utilisateur avant de le stocker
             const { password: _, ...userWithoutPassword } = users[0];
 
-            dispatch({ type: 'LOGIN_SUCCESS', payload: userWithoutPassword });
+            const fakeToken = btoa(
+                JSON.stringify({
+                    userId: userWithoutPassword.id,
+                    email: userWithoutPassword.email,
+                    role: 'admin',
+                    exp: Date.now() + 3600000
+                })
+            );
+
+            dispatch(
+                loginSuccess({
+                    user: userWithoutPassword,
+                    token: fakeToken
+                })
+            );
 
         } catch (error) {
-            dispatch({
-                type: 'LOGIN_FAILURE',
-                payload: 'Erreur de connexion au serveur'
-            });
+            dispatch(loginFailure('Erreur de connexion au serveur'));
         }
     }
 
@@ -58,7 +67,7 @@ export default function Login() {
                 <h1 className={styles.title}>TaskFlow</h1>
                 <p className={styles.subtitle}>Connectez-vous pour continuer</p>
 
-                {state.error && <div className={styles.error}>{state.error}</div>}
+                {error && <div className={styles.error}>{error}</div>}
 
                 <input
                     type="email"
@@ -81,9 +90,9 @@ export default function Login() {
                 <button
                     type="submit"
                     className={styles.button}
-                    disabled={state.loading}
+                    disabled={loading}
                 >
-                    {state.loading ? 'Connexion...' : 'Se connecter'}
+                    {loading ? 'Connexion...' : 'Se connecter'}
                 </button>
             </form>
         </div>
