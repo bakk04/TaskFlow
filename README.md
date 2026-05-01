@@ -2,6 +2,8 @@
 
 TaskFlow est une application de gestion de projets collaborative construite avec Next.js 15+, TypeScript, et Prisma.
 
+[Live Demo](https://task-flow-blush-one.vercel.app)
+
 ## Fonctionnalités (Séance 3 - Full-Stack & Performance)
 
 - **Backend Intégré (Prisma + SQLite)** : Migration complète de `json-server` vers une base de données SQLite gérée par l'ORM Prisma.
